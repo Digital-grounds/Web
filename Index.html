@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digitalgrounds</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+        }
+        header {
+            background-color: #000;
+            color: white;
+            padding: 0px;
+            font-size: 35px;
+            text-align: center;
+        }
+        .container {
+            margin: 89px;
+        }
+        .feed {
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #fff;
+        }
+        .rss-item {
+            background-color: #1c1e1f;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .rss-item a {
+            text-decoration: none;
+            font-size: 20px;
+            color: #0077cc;
+        }
+        .rss-item a:hover {
+            text-decoration: blink;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Digitalgrounds</h1>
+    </header>
+    <div class="container">
+        <div class="feed" id="rss-feed-1">
+            <h2>Politico <a href="https://www.politico.com"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-1"></div>
+        </div>
+        <div class="feed" id="rss-feed-2">
+            <h2>The Hill <a href="https://www.thehill.com"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-2"></div>
+        </div>
+        <div class="feed" id="rss-feed-3">
+            <h2>Fox News <a href="https://www.foxnews.com"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-3"></div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch and parse RSS feed
+        function fetchRSSFeed(url, elementId) {
+            fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById(elementId);
+                    container.innerHTML = ''; // Clear any existing content
+
+                    if (data.status === 'ok') {
+                        data.items.forEach(item => {
+                            const article = document.createElement('div');
+                            article.classList.add('rss-item');
+
+                            const title = document.createElement('h3');
+                            const link = document.createElement('a');
+                            link.href = item.link;
+                            link.textContent = item.title;
+                            link.target = "_blank";
+                            title.appendChild(link);
+                            article.appendChild(title);
+
+                            
+
+                            container.appendChild(article);
+                        });
+                    } else {
+                        container.innerHTML = '<p>Unable to load the feed. Please try again later.</p>';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching RSS feed:', err);
+                    const container = document.getElementById(elementId);
+                    container.innerHTML = '<p>Failed to load the RSS feed. Please check your connection.</p>';
+                });
+        }
+
+        // Example RSS Feed URLs (Replace these with your desired RSS feed URLs)
+        const newsFeedURL1 = 'https://rss.politico.com/congress.xml';
+        const newsFeedURL2 = 'https://thehill.com/homenews/feed/';
+        const newsFeedURL3 = 'https://moxie.foxnews.com/google-publisher/politics.xml';
+
+        // Fetch and display the feeds
+        fetchRSSFeed(newsFeedURL1, 'rss-1');
+        fetchRSSFeed(newsFeedURL2, 'rss-2');
+        fetchRSSFeed(newsFeedURL3, 'rss-3');
+    </script>
+</body>
+</html>
