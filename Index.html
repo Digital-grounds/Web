@@ -62,6 +62,34 @@
             <h2>Fox News <a href="https://www.foxnews.com"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
             <div id="rss-3"></div>
         </div>
+        <div class="feed" id="rss-feed-4">
+            <h2>Axios <a href="https://www.axios.com"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-4"></div>
+        </div>
+        <div class="feed" id="rss-feed-5">
+            <h2>Breitbart <a href="https://www.breitbart.com"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-5"></div>
+        </div>
+        <div class="feed" id="rss-feed-6">
+            <h2>CNN <a href="https://www.cnn.com"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-6"></div>
+        </div>
+        <div class="feed" id="rss-feed-7">
+            <h2>Daily Caller <a href="https://dailycaller.com"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-7"></div>
+        </div>
+        <div class="feed" id="rss-feed-8">
+            <h2>The Intercept <a href="https://theintercept.com/"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-8"></div>
+        </div>
+        <div class="feed" id="rss-feed-9">
+            <h2>NBC <a href="https://nbcnews.com/"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-9"></div>
+        </div>
+        <div class="feed" id="rss-feed-10">
+            <h2>WSJ <a href="https://wsj.com/"><i class="material-icons" style="color:#0077cc">website</i></a></h2>
+            <div id="rss-10"></div>
+        </div>
     </div>
 
     <script>
@@ -105,11 +133,25 @@
         const newsFeedURL1 = 'https://rss.politico.com/congress.xml';
         const newsFeedURL2 = 'https://thehill.com/homenews/feed/';
         const newsFeedURL3 = 'https://moxie.foxnews.com/google-publisher/politics.xml';
+        const newsFeedURL4 = 'https://api.axios.com/feed/';
+        const newsFeedURL5 = 'https://feeds.feedburner.com/BreitbartFeed/';
+        const newsFeedURL6 = 'http://rss.cnn.com/rss/cnn_allpolitics.rss';
+        const newsFeedURL7 = 'http://feeds.feedburner.com/dailycaller';
+        const newsFeedURL8 = 'https://theintercept.com/feed/?lang=en';
+        const newsFeedURL9 = 'https://feeds.nbcnews.com/nbcnews/public/politics';
+        const newsFeedURL10 = 'https://feeds.content.dowjones.io/public/rss/socialpoliticsfeed';
 
         // Fetch and display the feeds
         fetchRSSFeed(newsFeedURL1, 'rss-1');
         fetchRSSFeed(newsFeedURL2, 'rss-2');
         fetchRSSFeed(newsFeedURL3, 'rss-3');
+        fetchRSSFeed(newsFeedURL4, 'rss-4');
+        fetchRSSFeed(newsFeedURL5, 'rss-5');
+        fetchRSSFeed(newsFeedURL6, 'rss-6');
+        fetchRSSFeed(newsFeedURL7, 'rss-7');
+        fetchRSSFeed(newsFeedURL8, 'rss-8');
+        fetchRSSFeed(newsFeedURL9, 'rss-9');
+        fetchRSSFeed(newsFeedURL10, 'rss-10');
     </script>
 </body>
 </html>
