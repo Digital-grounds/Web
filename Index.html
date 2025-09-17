@@ -1,402 +1,235 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NHL Rosters — Player Ratings (0–100) from Public Fantasy Rankings</title>
-<style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; margin:0; padding:1rem; background:#f6f8fa;}
-  header{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
-  h1{font-size:1.25rem;margin:0}
-  .controls{display:flex;gap:.5rem;align-items:center}
-  input,select{padding:.4rem;border:1px solid #ccc;border-radius:6px}
-  #teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}
-  .team-card{background:white;border-radius:10px;padding:0.75rem;box-shadow:0 4px 14px rgba(20,30,40,0.06);border:1px solid #e6e9ee}
-  .team-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.5rem}
-  .team-name{font-weight:600}
-  table{width:100%;border-collapse:collapse}
-  td,th{padding:.35rem .4rem;border-top:1px solid #f0f0f2;font-size:0.92rem}
-  th{background:#fbfcfd;text-align:left;font-weight:600}
-  .rating{font-weight:700}
-  .meta{font-size:.85rem;color:#666}
-  .loader{display:inline-block;padding:.25rem .6rem;border-radius:999px;border:1px solid #ddd;background:#fff;font-size:.85rem}
-  footer{margin-top:1rem;font-size:.85rem;color:#444}
-  .small{font-size:.85rem;color:#666}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>US Political News — Live</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa6b2;--accent:#1e90ff}
+    html,body{height:100%;margin:0;font-family:Inter,Inter var,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#071331 0%, #071a2a 100%);color:#e6eef6}
+    .app{display:grid;grid-template-columns:1fr 420px;gap:20px;max-width:1400px;margin:24px auto;padding:20px}
+    .left{min-width:0}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#6a8cff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#041129}
+    h1{font-size:20px;margin:0}
+    .controls{display:flex;gap:8px;align-items:center}
+
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:12px;box-shadow:0 6px 22px rgba(2,6,23,0.6)}
+    .search{display:flex;gap:8px}
+    .search input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .filters{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+    .chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
+
+    .stories{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .story{display:flex;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02)}
+    .story img{width:140px;height:88px;object-fit:cover;border-radius:8px}
+    .meta{display:flex;flex-direction:column;gap:6px}
+    .meta h3{margin:0;font-size:15px}
+    .meta p{margin:0;color:var(--muted);font-size:13px}
+    .byline{font-size:12px;color:var(--muted)}
+
+    .right{position:sticky;top:20px}
+    .video-container{height:320px;border-radius:12px;overflow:hidden}
+    .chat-embed{height:320px;border-radius:12px;margin-top:12px;overflow:hidden}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+
+    @media (max-width:1100px){.app{grid-template-columns:1fr 360px}}
+    @media (max-width:860px){.app{grid-template-columns:1fr;padding:12px}.right{position:relative}.video-container,.chat-embed{height:260px}}
+
+    /* small helper */
+    .small{font-size:12px;color:var(--muted)}
+    a.button{background:var(--accent);color:#071129;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
+  </style>
 </head>
 <body>
-<header>
-  <div>
-    <h1>NHL Rosters — Player Ratings (0–100) based on public fantasy rankings</h1>
-    <div class="small">Rosters fetched from NHL API; fantasy ranks from FantasyPros (preferred) or NHL.com (fallback). See notes below.</div>
-  </div>
-  <div class="controls">
-    <label class="small">Filter team:
-      <select id="teamFilter"><option value="">All teams</option></select>
-    </label>
-    <label class="small">Min rating:
-      <input id="minRating" type="number" min="0" max="100" value="0" style="width:70px" />
-    </label>
-    <button id="refreshBtn">Refresh</button>
-  </div>
-</header>
+  <main class="app">
+    <section class="left">
+      <header>
+        <div class="brand">
+          <div class="logo">US</div>
+          <div>
+            <h1>US Political News — Live</h1>
+            <div class="small">Top political headlines, refreshed live (NewsAPI placeholder)</div>
+          </div>
+        </div>
+        <div class="controls">
+          <a class="button" id="refreshBtn" href="#">Refresh</a>
+        </div>
+      </header>
 
-<main>
-  <div id="status" class="meta">Ready. Click <b>Refresh</b> to load rosters & ratings. (May take 10–30s.)</div>
-  <div id="teams" aria-live="polite"></div>
-</main>
+      <div class="panel">
+        <div class="search">
+          <input id="searchInput" placeholder="Search headlines or keywords (e.g. economy, election, congress)" />
+          <a class="button" id="searchBtn" href="#">Search</a>
+        </div>
+        <div class="filters" id="filters">
+          <div class="chip" data-filter="all">All</div>
+          <div class="chip" data-filter="politics">Politics</div>
+          <div class="chip" data-filter="election">Elections</div>
+          <div class="chip" data-filter="policy">Policy</div>
+          <div class="chip" data-filter="opinion">Opinion</div>
+        </div>
+        <div class="stories" id="stories">
+          <!-- Articles injected here by JS -->
+        </div>
+        <div id="noResults" class="small" style="display:none;margin-top:12px">No articles found. Try a different keyword or click Refresh.</div>
+      </div>
 
-<footer>
-  <div class="small">
-    Sources attempted: NHL roster API; FantasyPros consensus rankings; NHL.com Top 200 fantasy list.
-  </div>
-  <div class="small">If ranks cannot be fetched due to CORS, you can run this file from a local server or use a proxy. The rating conversion is adjustable in the JS.</div>
-</footer>
+      <footer class="panel small">This is a demo page. To integrate real headlines, sign up at <code>newsapi.org</code> and set your API key in the script. Video embeds require a public domain allowed by YouTube.</footer>
+    </section>
 
-<script>
-/*
-  How this works (implementation notes):
-  1) Teams list is embedded below as an array of {id, name, code} (32 teams).
-  2) For each team we call the NHL roster endpoint:
-       https://api-web.nhle.com/v1/roster/{TEAM_CODE}/current
-     (This endpoint is publicly documented; but some browsers block CORS.)
-  3) We try to fetch FantasyPros consensus rankings via a simple text proxy (if allowed).
-     Fallback: NHL.com top 200 fantasy list.
-  4) Convert rank -> rating:
-       rating = Math.round(100 * ( (maxRank - rank + 1) / maxRank ))
-     and then clamp between 25 and 100 (so unranked players aren't zero).
-     You can change these constants below.
-*/
+    <aside class="right">
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong>Live Video</strong>
+          <div class="small">Embed a YouTube live stream</div>
+        </div>
 
-const teams = [
-  {"id":"ANA","name":"Anaheim Ducks","nhlCode":"ANA"},
-  {"id":"ARI","name":"Arizona Coyotes","nhlCode":"ARI"},
-  {"id":"BOS","name":"Boston Bruins","nhlCode":"BOS"},
-  {"id":"BUF","name":"Buffalo Sabres","nhlCode":"BUF"},
-  {"id":"CGY","name":"Calgary Flames","nhlCode":"CGY"},
-  {"id":"CAR","name":"Carolina Hurricanes","nhlCode":"CAR"},
-  {"id":"CHI","name":"Chicago Blackhawks","nhlCode":"CHI"},
-  {"id":"COL","name":"Colorado Avalanche","nhlCode":"COL"},
-  {"id":"CBJ","name":"Columbus Blue Jackets","nhlCode":"CBJ"},
-  {"id":"DAL","name":"Dallas Stars","nhlCode":"DAL"},
-  {"id":"DET","name":"Detroit Red Wings","nhlCode":"DET"},
-  {"id":"EDM","name":"Edmonton Oilers","nhlCode":"EDM"},
-  {"id":"FLA","name":"Florida Panthers","nhlCode":"FLA"},
-  {"id":"LAK","name":"Los Angeles Kings","nhlCode":"LAK"},
-  {"id":"MIN","name":"Minnesota Wild","nhlCode":"MIN"},
-  {"id":"MTL","name":"Montreal Canadiens","nhlCode":"MTL"},
-  {"id":"NSH","name":"Nashville Predators","nhlCode":"NSH"},
-  {"id":"NJD","name":"New Jersey Devils","nhlCode":"NJD"},
-  {"id":"NYI","name":"New York Islanders","nhlCode":"NYI"},
-  {"id":"NYR","name":"New York Rangers","nhlCode":"NYR"},
-  {"id":"OTT","name":"Ottawa Senators","nhlCode":"OTT"},
-  {"id":"PHI","name":"Philadelphia Flyers","nhlCode":"PHI"},
-  {"id":"PIT","name":"Pittsburgh Penguins","nhlCode":"PIT"},
-  {"id":"SEA","name":"Seattle Kraken","nhlCode":"SEA"},
-  {"id":"SJS","name":"San Jose Sharks","nhlCode":"SJS"},
-  {"id":"STL","name":"St. Louis Blues","nhlCode":"STL"},
-  {"id":"TBL","name":"Tampa Bay Lightning","nhlCode":"TBL"},
-  {"id":"TOR","name":"Toronto Maple Leafs","nhlCode":"TOR"},
-  {"id":"VAN","name":"Vancouver Canucks","nhlCode":"VAN"},
-  {"id":"VGK","name":"Vegas Golden Knights","nhlCode":"VGK"},
-  {"id":"WPG","name":"Winnipeg Jets","nhlCode":"WPG"}
-];
+        <div class="video-container" id="videoWrap">
+          <!-- YouTube video iframe -->
+          <iframe id="ytVideo" width="100%" height="100%" frameborder="0" allowfullscreen
+            src="https://www.youtube.com/embed/live_stream?channel=UCJg9wBPyKMNA5sRDnvzmkdg&autoplay=0&mute=1"></iframe>
+        </div>
 
-const statusEl = document.getElementById('status');
-const teamsContainer = document.getElementById('teams');
-const teamFilter = document.getElementById('teamFilter');
-const minRatingInput = document.getElementById('minRating');
-const refreshBtn = document.getElementById('refreshBtn');
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <strong>Live Chat</strong>
+          <div class="small">YouTube chat (embedded)</div>
+        </div>
 
-let rankMap = {}; // "LASTNAME, FIRSTNAME" -> rank or "PLAYER NAME" -> rank
-let rosterCache = {}; // teamCode -> roster
+        <div class="chat-embed" id="chatWrap">
+          <!-- YouTube live chat embed. Replace VIDEO_ID or use ?v=VIDEO_ID and embed_domain param if required -->
+          <iframe id="ytChat" width="100%" height="100%" frameborder="0"
+            src="https://www.youtube.com/live_chat?v=YDfiTGGPYCk"></iframe>
+          <div class="small" style="padding:8px">If chat doesn't load, replace <code>YOUR_VIDEO_ID</code> and <code>YOUR_DOMAIN</code> with your video id and your site domain.</div>
+        </div>
 
-function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+      </div>
 
-function normalizeName(n){
-  // simple normalization to match scraped names (last, first) or "First Last"
-  return n.trim().replace(/\s+/g,' ').toLowerCase();
-}
+      <div style="height:16px"></div>
 
-/* ========== Ranking fetchers ========== */
-async function fetchFantasyProsRankingsProxy(){
-  // Try to fetch FantasyPros consensus page via a public text proxy that returns HTML as text
-  // (This may be blocked by CORS on some browsers / environments.)
-  // We're using a harmless text-proxy endpoint to attempt to get an HTML page and parse it.
-  const proxy = 'https://r.jina.ai/http://www.fantasypros.com/nhl/rankings/overall.php';
-  try{
-    const res = await fetch(proxy);
-    if(!res.ok) throw new Error('proxy response not ok');
-    const txt = await res.text();
-    // Parse simple patterns: FantasyPros lists rows with player names and rank numbers.
-    // We'll extract lines that look like: "<td class='player'>...Player Name...</td>" etc.
-    const doc = new DOMParser().parseFromString(txt, 'text/html');
-    // FantasyPros structure can change; attempt multiple selectors for robustness.
-    const rows = doc.querySelectorAll('table.rankingTable tr, table.player-table tr, tr.player-row');
-    let localMap = {};
-    let maxRank=0;
-    rows.forEach(r=>{
-      const rankCell = r.querySelector('td.rank, td.position, td:first-child');
-      const nameCell = r.querySelector('a.player-name, td.player, td.name, td:nth-child(2) a');
-      if(nameCell && rankCell){
-        const rank = parseInt(rankCell.textContent.trim().replace(/\D/g,''),10);
-        const name = nameCell.textContent.trim();
-        if(rank && name){
-          localMap[normalizeName(name)] = rank;
-          if(rank>maxRank) maxRank=rank;
+      <div class="panel small">
+        <strong>Settings</strong>
+        <div style="margin-top:8px">News source: <code>newsapi.org</code> (Top headlines, country=us, category=politics)</div>
+        <div style="margin-top:8px">Default refresh interval: <input id="refreshInterval" type="number" value="120" style="width:80px"/> seconds</div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // ---------- Configuration (edit these) ----------
+    const NEWSAPI_KEY = 'eecd8d0abe0a4bcd8db9f530cda68a9b'; // <-- replace with your NewsAPI key
+    const NEWSAPI_ENDPOINT = 'https://newsapi.org/v2/top-headlines?country=us&category=politics&pageSize=20';
+
+    // Fallback sample articles (used if no API key is present or fetch fails)
+    const FALLBACK = [
+      {
+        title: 'Senate advances major budget bill after marathon debate',
+        description: 'Lawmakers reached an agreement late Tuesday to move forward with a federal spending package that addresses...' ,
+        url: '#',
+        urlToImage: 'https://images.unsplash.com/photo-1517433456452-f9633a875f6f?auto=format&fit=crop&w=800&q=60',
+        source: {name: 'Demo News'}
+      },
+      {
+        title: 'New polling shows shifting voter priorities ahead of midterms',
+        description: 'Recent surveys suggest the electorate is more focused on inflation and healthcare than foreign policy...',
+        url: '#',
+        urlToImage: 'https://images.unsplash.com/photo-1520685299202-7f1d4f58f7d1?auto=format&fit=crop&w=800&q=60',
+        source: {name: 'Demo News'}
+      }
+    ];
+
+    // ---------- UI helpers ----------
+    const storiesEl = document.getElementById('stories');
+    const noResultsEl = document.getElementById('noResults');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+    const filterChips = document.querySelectorAll('.chip');
+    const refreshIntervalInput = document.getElementById('refreshInterval');
+
+    let articles = [];
+    let currentFilter = 'all';
+    let refreshTimer = null;
+
+    function renderArticles(list){
+      storiesEl.innerHTML = '';
+      if(!list || list.length === 0){ noResultsEl.style.display='block'; return; }
+      noResultsEl.style.display='none';
+      list.forEach(a=>{
+        const el = document.createElement('article'); el.className='story';
+        el.innerHTML = `
+          <img loading="lazy" src="${a.urlToImage || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="">
+          <div class="meta">
+            <h3><a href="${a.url||'#'}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none">${escapeHtml(a.title||'Untitled')}</a></h3>
+            <p>${escapeHtml(a.description || '')}</p>
+            <div class="byline">${a.source?.name || 'Unknown'} • ${formatDate(a.publishedAt)}</div>
+          </div>
+        `;
+        storiesEl.appendChild(el);
+      })
+    }
+
+    function formatDate(iso){ if(!iso) return ''; try{ const d=new Date(iso); return d.toLocaleString(); }catch(e){return ''} }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    // ---------- News fetch ----------
+    async function fetchNews(){
+      if(!NEWSAPI_KEY || NEWSAPI_KEY === 'YOUR_NEWSAPI_KEY'){
+        console.warn('No NewsAPI key set — using fallback sample articles.');
+        articles = FALLBACK; renderArticles(articles); return;
+      }
+      try{
+        const res = await fetch(NEWSAPI_ENDPOINT, {headers:{'X-Api-Key': NEWSAPI_KEY}});
+        if(!res.ok) throw new Error('Network response not ok');
+        const data = await res.json();
+        articles = (data.articles || []).map(a=>({title:a.title,description:a.description,url:a.url,urlToImage:a.urlToImage,source:a.source,publishedAt:a.publishedAt}));
+        if(articles.length===0) articles = FALLBACK;
+        renderArticles(articles);
+      }catch(err){ console.error('Fetch news failed',err); articles=FALLBACK; renderArticles(articles); }
+    }
+
+    // ---------- Filtering & search ----------
+    function applyFilter(filter){ currentFilter = filter; Array.from(filterChips).forEach(c=>c.style.borderColor = c.dataset.filter===filter? 'var(--accent)':'rgba(255,255,255,0.02)'); filterResults(); }
+    function filterResults(){
+      const q = (searchInput.value||'').toLowerCase().trim();
+      let list = articles.filter(a=>{
+        if(!a) return false;
+        const text = ((a.title||'') + ' ' + (a.description||'')).toLowerCase();
+        if(currentFilter !== 'all'){
+          if(currentFilter==='election' && !text.includes('elect')) return false;
+          if(currentFilter==='opinion' && !text.includes('opinion') && !text.includes('analysis')) return false;
+          if(currentFilter==='policy' && !text.includes('policy') && !text.includes('bill') && !text.includes('legisla')) return false;
         }
-      } else {
-        // try fallback: columns in plain td
-        const tds = r.querySelectorAll('td');
-        if(tds.length>=2){
-          const rank = parseInt(tds[0].textContent.trim().replace(/\D/g,''),10);
-          const name = tds[1].textContent.trim();
-          if(rank && name){
-            localMap[normalizeName(name)] = rank;
-            if(rank>maxRank) maxRank=rank;
-          }
-        }
-      }
-    });
-    if(Object.keys(localMap).length > 80){ // sanity-check
-      console.info('FantasyPros rankings scraped (via proxy). Count:', Object.keys(localMap).length);
-      return {map: localMap, maxRank};
-    } else {
-      throw new Error('not enough entries from FantasyPros scrape');
+        if(q){ return text.includes(q); }
+        return true;
+      });
+      renderArticles(list);
     }
-  } catch(e){
-    console.warn('FantasyPros proxy fetch failed:', e.message);
-    return null;
-  }
-}
 
-async function fetchNHLTop200Fallback(){
-  // Fallback: NHL.com Top 200 fantasy list (more structured). Use same public text proxy.
-  const proxy = 'https://r.jina.ai/http://www.nhl.com/news/nhl-fantasy-hockey-top-250-200-rankings-drafts-players-big-board-281505474';
-  try{
-    const res = await fetch(proxy);
-    if(!res.ok) throw new Error('proxy response not ok');
-    const txt = await res.text();
-    const doc = new DOMParser().parseFromString(txt, 'text/html');
-    const lis = doc.querySelectorAll('ol li, .article-body li');
-    let localMap = {};
-    let maxRank = 0;
-    lis.forEach(li=>{
-      const text = li.textContent.trim();
-      // Expect text like "1. Connor McDavid — C, Edmonton Oilers"
-      const m = text.match(/^\s*(\d{1,3})\s*\.?\s+([A-Za-z\.'\- ]+)\s*(?:—|-|,)/);
-      if(m){
-        const rank = parseInt(m[1],10);
-        const name = m[2].trim();
-        localMap[normalizeName(name)] = rank;
-        if(rank>maxRank) maxRank=rank;
-      }
-    });
-    if(Object.keys(localMap).length>50){
-      console.info('NHL.com top list scraped. Count:',Object.keys(localMap).length);
-      return {map: localMap, maxRank};
-    } else {
-      throw new Error('not enough entries from NHL fallback scrape');
+    // ---------- Event wiring ----------
+    refreshBtn.addEventListener('click', e=>{ e.preventDefault(); fetchNews(); });
+    searchBtn.addEventListener('click', e=>{ e.preventDefault(); filterResults(); });
+    searchInput.addEventListener('keydown', e=>{ if(e.key==='Enter') filterResults(); });
+    filterChips.forEach(c=>c.addEventListener('click', ()=>applyFilter(c.dataset.filter)));
+
+    // auto-refresh
+    function setupAutoRefresh(){ clearInterval(refreshTimer); const sec = Math.max(10, Number(refreshIntervalInput.value) || 120); refreshTimer = setInterval(()=>fetchNews(), sec*1000); }
+    refreshIntervalInput.addEventListener('change', setupAutoRefresh);
+
+    // ---------- init ----------
+    applyFilter('all'); fetchNews(); setupAutoRefresh();
+
+    // ---------- small utility: let user quickly set a live video + chat ----------
+    function setLiveVideo(videoId, domain){
+      const video = document.getElementById('ytVideo');
+      const chat = document.getElementById('ytChat');
+      if(videoId){ video.src = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1`; }
+      if(videoId && domain){ chat.src = `https://www.youtube.com/live_chat?v=${videoId}&embed_domain=${domain}`; }
     }
-  } catch(e){
-    console.warn('NHL.com fallback fetch failed:', e.message);
-    return null;
-  }
-}
+    // Example: setLiveVideo('LIVE_VIDEO_ID','example.com')
 
-/* ========== Rating conversion ========== */
-function rankToRating(rank, maxRank){
-  // Convert a 1..maxRank rank into approx 100..30 scale.
-  // Formula: linear mapping to 100..(minScore) then clamp.
-  const minScore = 25;
-  if(!rank || !maxRank) return null;
-  const score = Math.round(100 * ( (maxRank - rank + 1) / maxRank ));
-  return Math.max(minScore, Math.min(100, score));
-}
-
-/* ========== NHL roster fetch ========== */
-async function fetchTeamRoster(teamCode){
-  // Uses NHL's documented roster endpoint: https://api-web.nhle.com/v1/roster/{TEAM}/current
-  // NOTE: may be blocked by CORS depending on browser environment.
-  const url = `https://api-web.nhle.com/v1/roster/${teamCode}/current`;
-  try{
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('roster fetch failed: ' + res.status);
-    const data = await res.json();
-    // data.players is expected array
-    return data;
-  } catch(e){
-    console.warn('fetchTeamRoster error', teamCode, e.message);
-    return null;
-  }
-}
-
-/* ========== UI rendering ========== */
-function buildTeamCard(team, roster, getRatingFn){
-  const card = document.createElement('section');
-  card.className = 'team-card';
-  const header = document.createElement('div');
-  header.className = 'team-header';
-  header.innerHTML = `<div class="team-name">${team.name} <span class="small">(${team.nhlCode})</span></div>
-                      <div class="meta small">Players: ${roster?.length ?? 0}</div>`;
-  card.appendChild(header);
-  const table = document.createElement('table');
-  const thead = document.createElement('thead');
-  thead.innerHTML = `<tr><th>Player</th><th>Pos</th><th>Number</th><th>Rating</th></tr>`;
-  table.appendChild(thead);
-  const tbody = document.createElement('tbody');
-  if(!roster || roster.length===0){
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="4" class="small">Roster not available (CORS or network issue)</td>`;
-    tbody.appendChild(tr);
-  } else {
-    // roster items might be objects with person {fullName} fields per NHL API
-    roster.forEach(p=>{
-      const name = p?.person?.fullName ?? p?.fullName ?? 'Unknown';
-      const pos = p?.position?.abbreviation ?? p?.position ?? '';
-      const num = p?.jerseyNumber ?? '';
-      const normalized = normalizeName(name);
-      const ratingInfo = getRatingFn(name, normalized);
-      const ratingText = ratingInfo.rating !== null ? `${ratingInfo.rating} / 100` : `<span class="small">N/A</span>`;
-      const tooltip = ratingInfo.source ? `title="source: ${ratingInfo.source} | rank: ${ratingInfo.rank ?? '—'}"` : '';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${name}</td><td>${pos}</td><td>${num}</td><td class="rating" ${tooltip}>${ratingText}</td>`;
-      tbody.appendChild(tr);
-    });
-  }
-  table.appendChild(tbody);
-  card.appendChild(table);
-  return card;
-}
-
-async function loadAll(){
-  statusEl.textContent = 'Loading ranking sources...';
-  // attempt to get fantasypros mapping
-  let rp = await fetchFantasyProsRankingsProxy();
-  let sourceLabel = 'FantasyPros consensus';
-  if(!rp){
-    rp = await fetchNHLTop200Fallback();
-    sourceLabel = 'NHL.com top fantasy list (fallback)';
-  }
-  if(!rp){
-    statusEl.textContent = 'Unable to fetch fantasy rank lists (CORS or network). Will show rosters; unrated players receive default scores.';
-    rankMap = {};
-  } else {
-    rankMap = rp.map;
-    var maxRankGlobal = rp.maxRank || 200;
-    statusEl.textContent = `Using ${sourceLabel}. Found ${Object.keys(rankMap).length} ranked players. Fetching rosters...`;
-  }
-
-  // populate team filter dropdown
-  teamFilter.innerHTML = '<option value="">All teams</option>' + teams.map(t=>`<option value="${t.nhlCode}">${t.name}</option>`).join('');
-
-  teamsContainer.innerHTML = '';
-  // fetch rosters sequentially (light throttle) to be friendly
-  for(const team of teams){
-    const loadingCard = document.createElement('div');
-    loadingCard.className = 'team-card';
-    loadingCard.innerHTML = `<div class="team-header"><div class="team-name">${team.name}</div><div class="meta loader">loading roster...</div></div>`;
-    teamsContainer.appendChild(loadingCard);
-  }
-
-  // fetch in parallel but with limited concurrency
-  const concurrency = 6;
-  let i=0;
-  async function worker(){
-    while(i<teams.length){
-      const idx = i++;
-      const team = teams[idx];
-      const data = await fetchTeamRoster(team.nhlCode);
-      let rosterArr = [];
-      if(data && Array.isArray(data.players)){
-        rosterArr = data.players.map(p=>({
-          person: p.person,
-          position: p.position,
-          jerseyNumber: p.jerseyNumber
-        }));
-      } else if(data && data.roster){ // some variations
-        rosterArr = data.roster.map(r=>({
-          person: r.person,
-          position: r.position,
-          jerseyNumber: r.jerseyNumber
-        }));
-      } else {
-        rosterArr = []; // failure case
-      }
-      rosterCache[team.nhlCode] = rosterArr;
-      // re-render all (simple)
-      renderTeams();
-      await sleep(200); // tiny pause between calls
-    }
-  }
-  // spawn workers
-  await Promise.all(Array.from({length:concurrency}).map(()=>worker()));
-
-  statusEl.textContent = 'All rosters attempted. Use filters above. (If some rosters show "not available", it may be a CORS/network issue.)';
-}
-
-function getRatingForName(name, normalized){
-  // try normalized full name
-  let rank = rankMap[normalized];
-  // try flip "Last, First" if not found
-  if(!rank){
-    // sometimes rankMap keys are "last, first"
-    const parts = name.trim().split(' ');
-    if(parts.length>1){
-      const alt = normalizeName(parts.slice(-1).join(' ') + ', ' + parts.slice(0,-1).join(' '));
-      rank = rankMap[alt];
-    }
-  }
-  let rating = null;
-  if(rank){
-    // Ideally use the same maxRank from scraped source; if unavailable, assume 250
-    const maxRank = (typeof maxRankGlobal !== 'undefined' && maxRankGlobal) ? maxRankGlobal : 250;
-    rating = rankToRating(rank, maxRank);
-    return {rating, rank, source: 'scraped fantasy rank'};
-  } else {
-    // fallback: unranked players get default 35-55 depending on position heuristics
-    // Simple heuristics: if name appears in many rosters as top lines? Not available here — use flat default 40.
-    const defaultRating = 40;
-    return {rating: defaultRating, rank: null, source: 'default (unranked)'};
-  }
-}
-
-function renderTeams(){
-  const minRating = parseInt(minRatingInput.value || '0', 10) || 0;
-  const filterCode = teamFilter.value;
-  teamsContainer.innerHTML = '';
-  for(const team of teams){
-    if(filterCode && filterCode !== team.nhlCode) continue;
-    const roster = rosterCache[team.nhlCode] ?? [];
-    // Filter players by rating
-    const filteredRoster = roster.filter(p=>{
-      const name = p?.person?.fullName ?? '';
-      const normalized = normalizeName(name);
-      const r = getRatingForName(name, normalized);
-      return (r.rating || 0) >= minRating;
-    });
-    const card = buildTeamCard(team, filteredRoster, (name, normalized)=>getRatingForName(name, normalized));
-    teamsContainer.appendChild(card);
-  }
-}
-
-/* ========== Hooks ========== */
-refreshBtn.addEventListener('click', async ()=>{
-  statusEl.textContent = 'Starting fetch...';
-  teamsContainer.innerHTML = '';
-  rosterCache = {};
-  rankMap = {};
-  await loadAll();
-});
-
-teamFilter.addEventListener('change', renderTeams);
-minRatingInput.addEventListener('input', renderTeams);
-
-/* ========== Start (optional auto-load) ========== */
-let maxRankGlobal = 250; // default if scraped source doesn't provide
-// start initial load automatically:
-loadAll().catch(e=>{ console.error(e); statusEl.textContent = 'Error initiating load: '+e.message; });
-
-</script>
+  </script>
 </body>
 </html>

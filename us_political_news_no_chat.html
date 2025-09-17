@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>US Political News — Live</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa6b2;--accent:#1e90ff}
+    html,body{height:100%;margin:0;font-family:Inter,Inter var,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#071331 0%, #071a2a 100%);color:#e6eef6}
+    .app{display:grid;grid-template-columns:1fr 420px;gap:20px;max-width:1400px;margin:24px auto;padding:20px}
+    .left{min-width:0}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#6a8cff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#041129}
+    h1{font-size:20px;margin:0}
+    .controls{display:flex;gap:8px;align-items:center}
+
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:12px;box-shadow:0 6px 22px rgba(2,6,23,0.6)}
+    .search{display:flex;gap:8px}
+    .search input{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .filters{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+    .chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
+
+    .stories{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .story{display:flex;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02)}
+    .story img{width:140px;height:88px;object-fit:cover;border-radius:8px}
+    .meta{display:flex;flex-direction:column;gap:6px}
+    .meta h3{margin:0;font-size:15px}
+    .meta p{margin:0;color:var(--muted);font-size:13px}
+    .byline{font-size:12px;color:var(--muted)}
+
+    .right{position:sticky;top:20px}
+    .video-container{height:320px;border-radius:12px;overflow:hidden}
+    .chat-embed{height:320px;border-radius:12px;margin-top:12px;overflow:hidden}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+
+    @media (max-width:1100px){.app{grid-template-columns:1fr 360px}}
+    @media (max-width:860px){.app{grid-template-columns:1fr;padding:12px}.right{position:relative}.video-container,.chat-embed{height:260px}}
+
+    /* small helper */
+    .small{font-size:12px;color:var(--muted)}
+    a.button{background:var(--accent);color:#071129;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:600}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="left">
+      <header>
+        <div class="brand">
+          <div class="logo">US</div>
+          <div>
+            <h1>US Political News — Live</h1>
+            <div class="small">Top political headlines, refreshed live (NewsAPI placeholder)</div>
+          </div>
+        </div>
+        <div class="controls">
+          <a class="button" id="refreshBtn" href="#">Refresh</a>
+        </div>
+      </header>
+
+      <div class="panel">
+        <div class="search">
+          <input id="searchInput" placeholder="Search headlines or keywords (e.g. economy, election, congress)" />
+          <a class="button" id="searchBtn" href="#">Search</a>
+        </div>
+        <div class="filters" id="filters">
+          <div class="chip" data-filter="all">All</div>
+          <div class="chip" data-filter="politics">Politics</div>
+          <div class="chip" data-filter="election">Elections</div>
+          <div class="chip" data-filter="policy">Policy</div>
+          <div class="chip" data-filter="opinion">Opinion</div>
+        </div>
+        <div class="stories" id="stories">
+          <!-- Articles injected here by JS -->
+        </div>
+        <div id="noResults" class="small" style="display:none;margin-top:12px">No articles found. Try a different keyword or click Refresh.</div>
+      </div>
+
+      <footer class="panel small">This is a demo page. To integrate real headlines, sign up at <code>newsapi.org</code> and set your API key in the script. Video embeds require a public domain allowed by YouTube.</footer>
+    </section>
+
+    <aside class="right">
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong>Live Video</strong>
+          <div class="small">Embed a YouTube live stream</div>
+        </div>
+
+        <div class="video-container" id="videoWrap">
+          <!-- YouTube video iframe -->
+          <iframe id="ytVideo" width="100%" height="100%" frameborder="0" allowfullscreen
+            src="https://www.youtube.com/embed/YDfiTGGPYCk?autoplay=0&mute=1"></iframe>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+          <strong>Live Chat</strong>
+          <div class="small">YouTube chat (embedded)</div>
+        </div>
+
+        </div>
+
+      </div>
+
+      <div style="height:16px"></div>
+
+      <div class="panel small">
+        <strong>Settings</strong>
+        <div style="margin-top:8px">News source: <code>newsapi.org</code> (Top headlines, country=us, category=politics)</div>
+        <div style="margin-top:8px">Default refresh interval: <input id="refreshInterval" type="number" value="120" style="width:80px"/> seconds</div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const NEWSAPI_KEY = 'eecd8d0abe0a4bcd8db9f530cda68a9b';
+    const NEWSAPI_ENDPOINT = 'https://newsapi.org/v2/top-headlines?country=us&category=politics&pageSize=20';
+
+    const FALLBACK = [
+      { title: 'Senate advances major budget bill after marathon debate',
+        description: 'Lawmakers reached an agreement late Tuesday to move forward with a federal spending package that addresses...',
+        url: '#',
+        urlToImage: 'https://images.unsplash.com/photo-1517433456452-f9633a875f6f?auto=format&fit=crop&w=800&q=60',
+        source: {name: 'Demo News'}
+      },
+      { title: 'New polling shows shifting voter priorities ahead of midterms',
+        description: 'Recent surveys suggest the electorate is more focused on inflation and healthcare than foreign policy...',
+        url: '#',
+        urlToImage: 'https://images.unsplash.com/photo-1520685299202-7f1d4f58f7d1?auto=format&fit=crop&w=800&q=60',
+        source: {name: 'Demo News'}
+      }
+    ];
+
+    const storiesEl = document.getElementById('stories');
+    const noResultsEl = document.getElementById('noResults');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+    const filterChips = document.querySelectorAll('.chip');
+    const refreshIntervalInput = document.getElementById('refreshInterval');
+
+    let articles = [];
+    let currentFilter = 'all';
+    let refreshTimer = null;
+
+    function renderArticles(list){
+      storiesEl.innerHTML = '';
+      if(!list || list.length === 0){ noResultsEl.style.display='block'; return; }
+      noResultsEl.style.display='none';
+      list.forEach(a=>{
+        const el = document.createElement('article'); el.className='story';
+        el.innerHTML = `
+          <img loading="lazy" src="${a.urlToImage || 'https://via.placeholder.com/300x180?text=No+Image'}" alt="">
+          <div class="meta">
+            <h3><a href="${a.url||'#'}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none">${escapeHtml(a.title||'Untitled')}</a></h3>
+            <p>${escapeHtml(a.description || '')}</p>
+            <div class="byline">${a.source?.name || 'Unknown'} • ${formatDate(a.publishedAt)}</div>
+          </div>
+        `;
+        storiesEl.appendChild(el);
+      })
+    }
+
+    function formatDate(iso){ if(!iso) return ''; try{ const d=new Date(iso); return d.toLocaleString(); }catch(e){return ''} }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    async function fetchNews(){
+      if(!NEWSAPI_KEY || NEWSAPI_KEY === 'eecd8d0abe0a4bcd8db9f530cda68a9b'){
+        console.warn('No NewsAPI key set — using fallback sample articles.');
+        articles = FALLBACK; renderArticles(articles); return;
+      }
+      try{
+        const res = await fetch(NEWSAPI_ENDPOINT, {headers:{'X-Api-Key': NEWSAPI_KEY}});
+        if(!res.ok) throw new Error('Network response not ok');
+        const data = await res.json();
+        articles = (data.articles || []).map(a=>({title:a.title,description:a.description,url:a.url,urlToImage:a.urlToImage,source:a.source,publishedAt:a.publishedAt}));
+        if(articles.length===0) articles = FALLBACK;
+        renderArticles(articles);
+      }catch(err){ console.error('Fetch news failed',err); articles=FALLBACK; renderArticles(articles); }
+    }
+
+    function applyFilter(filter){ currentFilter = filter; Array.from(filterChips).forEach(c=>c.style.borderColor = c.dataset.filter===filter? 'var(--accent)':'rgba(255,255,255,0.02)'); filterResults(); }
+    function filterResults(){
+      const q = (searchInput.value||'').toLowerCase().trim();
+      let list = articles.filter(a=>{
+        if(!a) return false;
+        const text = ((a.title||'') + ' ' + (a.description||'')).toLowerCase();
+        if(currentFilter !== 'all'){
+          if(currentFilter==='election' && !text.includes('elect')) return false;
+          if(currentFilter==='opinion' && !text.includes('opinion') && !text.includes('analysis')) return false;
+          if(currentFilter==='policy' && !text.includes('policy') && !text.includes('bill') && !text.includes('legisla')) return false;
+        }
+        if(q){ return text.includes(q); }
+        return true;
+      });
+      renderArticles(list);
+    }
+
+    refreshBtn.addEventListener('click', e=>{ e.preventDefault(); fetchNews(); });
+    searchBtn.addEventListener('click', e=>{ e.preventDefault(); filterResults(); });
+    searchInput.addEventListener('keydown', e=>{ if(e.key==='Enter') filterResults(); });
+    filterChips.forEach(c=>c.addEventListener('click', ()=>applyFilter(c.dataset.filter)));
+
+    function setupAutoRefresh(){ clearInterval(refreshTimer); const sec = Math.max(10, Number(refreshIntervalInput.value) || 120); refreshTimer = setInterval(()=>fetchNews(), sec*1000); }
+    refreshIntervalInput.addEventListener('change', setupAutoRefresh);
+
+    applyFilter('all'); fetchNews(); setupAutoRefresh();
+
+    function setLiveVideo(videoId, domain){
+      const video = document.getElementById('ytVideo');
+      const chat = document.getElementById('ytChat');
+      if(videoId){ video.src = `https://www.youtube.com/embed/${videoId}?autoplay=0&mute=1`; }
+      if(videoId && domain){ chat.src = `https://www.youtube.com/live_chat?v=${videoId}&embed_domain=${domain}`; }
+    }
+  </script>
+</body>
+</html>
